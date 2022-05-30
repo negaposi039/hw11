@@ -18,9 +18,13 @@ void createGraph(GraphNode** g); // 그래프 생성 함수
 int insertVertex(GraphNode* g, int v); // 정점 삽입 함수
 int insertEdge(GraphNode* g, int u, int v); // 간선 삽입 함수
 void DepthFS(GraphNode* g, int v); // Depth First Search 함수
-//void BreathFS(GraphNode* g, int v); // Breath First Search 함수
+void BreathFS(GraphNode* g, int v); // Breath First Search 함수
 void printGraph(GraphNode* g); // 그래프 출력 함수
 int destroyGraph(GraphNode* g); // 그래프 삭제 함수
+void enQueue(GraphNode* Q); // 큐 삽입 함수
+GraphNode* deQueue(); // 큐 삭제 함수
+GraphNode* pop(); // 스택 pop 함수
+void push(GraphNode* Q); // 스택 push 함수
 
 int main() {	
 
@@ -62,11 +66,11 @@ int main() {
 				scanf("%d", &u);
 				DepthFS(Graph, u);
 				break;
-		//case 'b': case 'B':	// 명령어 B : BreathFS 함수 호출
-				//printf("BreathFS = ");
-				//scanf("%d", &u);
-				//BreathFS(Graph, u);
-				//break;
+		case 'b': case 'B':	// 명령어 B : BreathFS 함수 호출
+				printf("BreathFS = ");
+				scanf("%d", &u);
+				BreathFS(Graph, u);
+				break;
 		case 'p': case 'P':	// 명령어 P : 그래프 출력 함수 호출
 			printGraph(Graph);
 			break;
@@ -214,6 +218,41 @@ void DepthFS(GraphNode* g, int v) {
 	}
 }
 
+void BreathFS(GraphNode* g, int v) {
+	if((g+v)->Vertex == -1){ // 오류 처리
+		printf("\nThere is no Vertex.\n");    
+		return ;
+	}
+    if (v < 0 || v > MAX_VERTEX-1) {
+		printf("\nError\n");
+		return;
+	}
+
+	front = -1;
+	rear = -1;
+	int visit[MAX_VERTEX]; 
+    for(int i = 0; i < MAX_VERTEX; i++) {  // 방문에 대한 초기화
+        visit[i]=0;
+    }
+
+	GraphNode* temp = NULL;
+	temp = (g+v);
+	enQueue(temp); // 큐 삽입
+	visit[v]=1;
+    printf("  [%d]  ", v); // 정점 출력
+	while(rear!=front) { // rear != front인 경우
+		temp = deQueue(); // 큐 삭제
+		for(temp;temp;temp=temp->link) {
+			v = temp -> Vertex;    // 정점 저장
+			if(!visit[v]) { // 방문을 하지 않은 경우
+				enQueue(g+v); // 큐 삽입
+				visit[v]=1;
+                printf("  [%d]  ", temp->Vertex); // 정점 출력
+            }
+		}
+	}
+}
+
 void printGraph(GraphNode* g) {
 	for(int num=0; num < MAX_VERTEX; num++) {
 		GraphNode* temp = (g + num);
@@ -250,4 +289,46 @@ int destroyGraph(GraphNode* g) {
 		free(temp); // 메모리 해제
 		temp = NULL;
 	}
+}
+
+void enQueue(GraphNode* Q) {
+	if(rear >= MAX_VERTEX - 1) {  // 큐가 꽉 찬 경우
+        printf("\nQueue is Full.\n");
+		return;
+    }
+	else { // 큐가 비어있을 시 삽입
+        queue[rear+1] = Q;
+		rear++;
+	}
+}
+
+GraphNode* deQueue() {
+	if (front == rear || front == MAX_VERTEX - 1) { // 큐가 텅 비었을 시 종료
+        return 0;	
+	}
+	else { // 큐에 값이 있으면 삭제
+        return queue[front+1];
+		front++;
+	}
+
+}
+
+GraphNode* pop() { // 스택 Pop
+	if (top == -1) {
+		return NULL;
+	}
+	else {
+    	return stack[top--];
+	}
+    
+}
+
+void push(GraphNode* Q) {	 // 스택 Push
+	if (top == MAX_VERTEX - 1) { // 스택이 꽉 찼을 경우
+    	printf("Stack is Full.\n");	
+	}
+	else {
+		stack[top+1]=Q;
+		top++;
+	} 
 }
